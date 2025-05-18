@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voice Recognizer - Web Speech API</title>
+    <!-- Dalam index.html -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Voice Recognizer</h1>
+
+      <button id="toggleBtn" onclick="toggleListening()">
+        🔴 Mulai Mendengarkan
+      </button>
+      <p id="status">Status: Tidak aktif</p>
+
+      <div id="result-container">
+        <p><strong>Hasil:</strong></p>
+        <div id="result" class="result-box">
+          <!-- Hasil ucapan akan terus ditambahkan di sini -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = "id-ID";
+      recognition.interimResults = false;
+      recognition.continuous = true;
+
+      let isListening = false;
+
+      recognition.onresult = (event) => {
+        const last = event.results.length - 1;
+        const text = event.results[last][0].transcript;
+
+        const resultDiv = document.getElementById("result");
+        const newParagraph = document.createElement("p");
+        newParagraph.textContent = text;
+        resultDiv.appendChild(newParagraph);
+
+        resultDiv.scrollTop = resultDiv.scrollHeight; // scroll ke bawah otomatis
+      };
+
+      recognition.onstart = () => {
+        document.getElementById("status").innerText =
+          "Status: 🎤 Mendengarkan...";
+        document.getElementById("toggleBtn").innerText =
+          "🛑 Berhenti Mendengarkan";
+      };
+
+      recognition.onend = () => {
+        if (isListening) {
+          recognition.start();
+        } else {
+          document.getElementById("status").innerText = "Status: Tidak aktif";
+          document.getElementById("toggleBtn").innerText =
+            "🔴 Mulai Mendengarkan";
+        }
+      };
+
+      function toggleListening() {
+        if (!isListening) {
+          isListening = true;
+          recognition.start();
+        } else {
+          isListening = false;
+          recognition.stop();
+        }
+      }
+    </script>
+  </body>
+</html>

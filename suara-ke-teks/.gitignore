@@ -1,0 +1,5 @@
+# Ignore environment variables
+.venv
+.env.local
+.env.production
+.env
